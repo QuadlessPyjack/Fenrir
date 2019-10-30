@@ -10,6 +10,8 @@ namespace Fenrir
         public bool IsSelectBlocking = false;
         public bool IsSelected = false;
 
+        public Cell currentCell = null;
+
         public List<Tile> AttachedOverlays;
 
         public Entity(Entity entity) : base(entity)
@@ -48,6 +50,10 @@ namespace Fenrir
             Constants.SelectedEntities.Add(this);
 
             IsSelected = true;
+
+            // we're displaying an overlay at the current cell position
+            // so mark for redraw
+            currentCell.IsDirty = true;
 
             return IsSelectBlocking;
         }

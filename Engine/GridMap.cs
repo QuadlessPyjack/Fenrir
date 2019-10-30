@@ -92,31 +92,22 @@ namespace Fenrir
         public void UpdateMap(RenderTexture renderSurface)
         {
             RedrawMapAt(renderSurface, new Vector2i(0, 0), new Vector2i(Width, Height));
-            //for (int x = 0; x < Width; x++)
-            //{
-            //    for (int y = 0; y < Height; y++)
-            //    {
-            //        Cell currentCell = _cells[x, y];
-
-            //        foreach (Entity entity in currentCell.Entities)
-            //        {
-            //            renderSurface.Draw(entity);
-            //            foreach (Tile attachedOverlay in entity.AttachedOverlays)
-            //            {
-            //                renderSurface.Draw(attachedOverlay);
-            //            }
-            //        }
-            //    }
-            //}
         }
 
         public void RedrawMapAt(RenderTexture renderSurface, Vector2i start, Vector2i end)
         {
+            List<Entity> dirtyEntities = new List<Entity>();
+
             for (int x = start.X; x < end.X; x++)
             {
                 for (int y = start.Y; y < end.Y; y++)
                 {
                     Cell currentCell = _cells[x, y];
+
+                    if (!currentCell.IsDirty)
+                    {
+                        continue;
+                    }
 
                     foreach (Tile tile in currentCell.Tiles)
                     {
@@ -125,14 +116,17 @@ namespace Fenrir
                         //tile.DumpTextureToFile("./tile_" + x + "_" + y + ".jpg");
                     }
 
-                    foreach (Entity entity in currentCell.Entities)
-                    {
-                        renderSurface.Draw(entity);
-                        foreach (Tile attachedOverlay in entity.AttachedOverlays)
-                        {
-                            renderSurface.Draw(attachedOverlay);
-                        }
-                    }
+                    dirtyEntities.Add(currentCell.Entities);
+                    currentCell.IsDirty = false;
+                }
+            }
+
+            foreach (Entity entity in dirtyEntities)
+            {
+                renderSurface.Draw(entity);
+                foreach (Tile attachedOverlay in entity.AttachedOverlays)
+                {
+                    renderSurface.Draw(attachedOverlay);
                 }
             }
         }

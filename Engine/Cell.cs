@@ -52,6 +52,7 @@ namespace Fenrir
         public void AddEntity(Entity entity)
         {
             Entities.Add(entity);
+            entity.currentCell = this;
             updateTilePosition(entity);
         }
 

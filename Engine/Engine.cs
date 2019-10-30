@@ -84,7 +84,9 @@ namespace Fenrir
 
                 if (mapNeedsUpdate)
                 {
-                    currentMap.RedrawMapAt(mapSurface, new Vector2i(0, 0), new Vector2i(currentMap.Width, currentMap.Height));
+                    // update current view only
+                    Vector2i viewEdge = camera.Position + (Vector2i)camera.GetView().Center;
+                    currentMap.RedrawMapAt(mapSurface, camera.Position, viewEdge);
                     mapSurface.Display();
                 }
 
