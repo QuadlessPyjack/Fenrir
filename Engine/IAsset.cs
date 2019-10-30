@@ -4,7 +4,7 @@
     {
         string GetTypeName();
         string GetName();
-
         int GetId();
+        void SetSize(int size);
     }
 }

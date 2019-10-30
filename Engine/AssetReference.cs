@@ -33,5 +33,10 @@ namespace Fenrir
         {
             return _assetRootCell;
         }
+
+        public void SetSize(int _)
+        {
+            // N/A
+        }
     }
 }

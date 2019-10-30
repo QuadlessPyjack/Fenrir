@@ -6,6 +6,7 @@ namespace Fenrir
     public class Tile : Sprite, IAsset
     {
         public float Z { get; set; }
+        public int Size { get; private set; }
 
         protected string _name;
         protected int _id;
@@ -21,6 +22,7 @@ namespace Fenrir
             _name = tile._name;
             _id = tile._id;
             Z = tile.Z;
+            Size = tile.Size;
             Texture = tile.Texture;
         }
 
@@ -44,6 +46,11 @@ namespace Fenrir
         public virtual string GetName()
         {
             return _name;
+        }
+
+        public virtual void SetSize(int size)
+        {
+            Size = size;
         }
 
         public int GetId()

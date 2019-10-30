@@ -62,11 +62,13 @@ namespace Fenrir
             string assetName = _iniSection["Name"].Trim('"');
             _ = bool.TryParse(_iniSection["IsSelectable"], out bool isSelectable);
             _ = int.TryParse(_iniSection["Id"], out int id);
+            _ = int.TryParse(_iniSection["Size"], out int size);
 
             Texture cachedTexture = TextureFactory.GetTexture(textureName);
 
             Entity entity = new Entity(cachedTexture, assetName, id);
             entity.IsSelectable = isSelectable;
+            entity.SetSize(size);
 
             return entity;
         }
@@ -97,10 +99,12 @@ namespace Fenrir
             string textureName = _iniSection["Texture"].Trim('"');
             string assetName = _iniSection["Name"].Trim('"');
             _ = int.TryParse(_iniSection["Id"], out int id);
+            _ = int.TryParse(_iniSection["Size"], out int size);
 
             Texture cachedTexture = TextureFactory.GetTexture(textureName);
 
             Tile tile = new Tile(cachedTexture, assetName, id);
+            tile.SetSize(size);
 
             return tile;
         }

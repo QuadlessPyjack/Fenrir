@@ -38,6 +38,7 @@ namespace Fenrir
             MapInfo mapInfo = mapLoader.Load("m_01");
 
             currentMap = new GridMap();
+            Constants.CurrentMap = currentMap;
             currentMap.GenerateCells(mapInfo);
 
             uint mapWidth = (uint)mapInfo.Width * Constants.SpriteSize;
@@ -85,9 +86,10 @@ namespace Fenrir
                 if (mapNeedsUpdate)
                 {
                     // update current view only
-                    Vector2i viewEdge = camera.Position + (Vector2i)camera.GetView().Center;
-                    currentMap.RedrawMapAt(mapSurface, camera.Position, viewEdge);
+                    Vector2i viewEdge = (Vector2i)(camera.Position + camera.GetView().Center / Constants.SpriteSize);
+                    currentMap.RedrawMapAt(mapSurface, (Vector2i)camera.Position, viewEdge);
                     mapSurface.Display();
+                    mapNeedsUpdate = false;
                 }
 
                 Sprite renderedMap = new Sprite(mapSurface.Texture);

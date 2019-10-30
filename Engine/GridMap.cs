@@ -1,5 +1,6 @@
 ﻿using SFML.System;
 using SFML.Graphics;
+using System.Collections.Generic;
 
 namespace Fenrir
 {
@@ -112,11 +113,14 @@ namespace Fenrir
                     foreach (Tile tile in currentCell.Tiles)
                     {
                         renderSurface.Draw(tile);
-
+                        //if (tile.Size > 1)
+                        {
+                            //markAdjacentCellsForRedraw(currentCell.GridPosition, tile.Size);
+                        }
                         //tile.DumpTextureToFile("./tile_" + x + "_" + y + ".jpg");
                     }
 
-                    dirtyEntities.Add(currentCell.Entities);
+                    dirtyEntities.AddRange(currentCell.Entities);
                     currentCell.IsDirty = false;
                 }
             }
@@ -127,8 +131,28 @@ namespace Fenrir
                 foreach (Tile attachedOverlay in entity.AttachedOverlays)
                 {
                     renderSurface.Draw(attachedOverlay);
+                    //if (attachedOverlay.Size > 1)
+                    {
+                        //markAdjacentCellsForRedraw(entity.currentCell.GridPosition, attachedOverlay.Size);
+                    }
                 }
             }
+        }
+
+        public void MarkAdjacentCellsForRedraw(Vector2i rootCell, int size)
+        {
+                for (int adjacentCellXIdx = 0; adjacentCellXIdx < size; adjacentCellXIdx++)
+                {
+                    for (int adjacentCellYIdx = 0; adjacentCellYIdx < size; adjacentCellYIdx++)
+                    {
+                        if ((adjacentCellXIdx == 0) && (adjacentCellYIdx == 0))
+                        {
+                            continue;
+                        }
+                        Cell adjacentCell = GetCellAt(rootCell.X + adjacentCellXIdx, rootCell.Y + adjacentCellYIdx);
+                        adjacentCell.IsDirty = true;
+                    }
+                }
         }
 
         public Cell GetCellAt(int x, int y)

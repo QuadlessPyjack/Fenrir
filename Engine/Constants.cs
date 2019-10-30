@@ -19,6 +19,7 @@ namespace Fenrir
         public static Dictionary<string, IAsset> LoadedAssets = new Dictionary<string, IAsset>();
 
         public static List<Entity> SelectedEntities = new List<Entity>();
+        public static GridMap CurrentMap;
 
         public static float CameraSpeed = 3.0f;
     }

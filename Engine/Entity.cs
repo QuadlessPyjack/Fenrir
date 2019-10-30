@@ -1,4 +1,5 @@
 ﻿using SFML.Graphics;
+using SFML.System;
 using System;
 using System.Collections.Generic;
 
@@ -13,6 +14,7 @@ namespace Fenrir
         public Cell currentCell = null;
 
         public List<Tile> AttachedOverlays;
+        private int _overlaySize;
 
         public Entity(Entity entity) : base(entity)
         {
@@ -43,6 +45,13 @@ namespace Fenrir
             Tile cachedTile = AssetFactory.GetAsset("3") as Tile;
             Tile selectedOverlay = new Tile(cachedTile);
             selectedOverlay.Position = Position;
+            _overlaySize = selectedOverlay.Size;
+
+            if (_overlaySize != Size)
+            {
+                float scale = (float)Size / selectedOverlay.Size;
+                selectedOverlay.Scale = new Vector2f(scale, scale);
+            }
 
             AttachedOverlays.Add(selectedOverlay);
 
@@ -66,6 +75,8 @@ namespace Fenrir
             }
 
             AttachedOverlays.Clear();
+            currentCell.IsDirty = true;
+            Constants.CurrentMap.MarkAdjacentCellsForRedraw(currentCell.GridPosition, _overlaySize);
             IsSelected = false;
         }
     }
