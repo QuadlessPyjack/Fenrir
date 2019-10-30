@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+using Fenrir;
+
+namespace Game
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Starting engine");
+            _ = new Engine();
+        }
+    }
+}
