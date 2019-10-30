@@ -95,6 +95,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnimatedSprite.cs" />
     <Compile Include="AssetReference.cs" />
     <Compile Include="Cell.cs" />
     <Compile Include="IAsset.cs" />
