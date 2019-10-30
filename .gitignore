@@ -1,1 +1,7 @@
 Engine/bin/* 
+Engine/obj/*
+Fenrir/.vs/*
+Fenrir/bin/*
+Fenrir/obj/*
+Game/bin/*
+Game/obj/*
