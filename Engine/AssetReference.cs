@@ -4,22 +4,20 @@ namespace Fenrir
 {
     // Dummy asset used to cover multi-cell assets (for example - collision purposes)
     // Acts as a reference to the "root" cell of the multi-cell asset it belongs to
-    public class AssetReference : IAsset
+    public class AssetReference : Entity
     {
-        public Vector2i Position { get; set; }
-
         private Cell _assetRootCell;
-        public int GetId()
+        public override int GetId()
         {
             return Constants.AssetReferenceId;
         }
 
-        public string GetName()
+        public override string GetName()
         {
             return "Asset Reference";
         }
 
-        public string GetTypeName()
+        public override string GetTypeName()
         {
             return "reference";
         }
@@ -34,9 +32,13 @@ namespace Fenrir
             return _assetRootCell;
         }
 
-        public void SetSize(int _)
+        public override void SetSize(Vector2i _)
         {
             // N/A
+        }
+
+        public override void Update()
+        {
         }
     }
 }

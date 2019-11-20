@@ -8,22 +8,25 @@ using System.Threading.Tasks;
 
 namespace Fenrir
 {
-    class AnimatedSprite : Sprite
+    public class AnimatedSprite : Sprite
     {
         public IntRect FrameRect = new IntRect(0, 0, Constants.SpriteSize, Constants.SpriteSize);
-        public int FramesPerSecond { get { return FramesPerSecond; } set { FramesPerSecond = value;  _frameDuration = 1 / FramesPerSecond; } }
-        private float _frameDuration = 1 / 30;
+        private float _frameDuration = 1.0f / 30.0f;
+        public int FramesPerSecond { get { return _framesPerSecond; } set { _framesPerSecond = value;  _frameDuration = 1.0f / _framesPerSecond; } }
+        private int _framesPerSecond = 30;
         public bool IsLooping = false;
         public bool IsPingPong = false;
         private IntRect initialFrame;
         private Clock _animationClock;
         private bool isRunning = false;
-        private int _direction;
+        private int _direction = 1;
 
         public AnimatedSprite()
         {
             _animationClock = new Clock();
             initialFrame = FrameRect;
+
+            updateTexture();
         }
 
         public AnimatedSprite(SFML.Graphics.Texture texture, IntRect frameSize) : base(texture)
@@ -31,6 +34,8 @@ namespace Fenrir
             FrameRect = frameSize;
             initialFrame = FrameRect;
             _animationClock = new Clock();
+
+            updateTexture();
         }
 
         public AnimatedSprite(SFML.Graphics.Texture texture, IntRect rectangle, IntRect frameSize) : base(texture, rectangle)
@@ -38,6 +43,8 @@ namespace Fenrir
             FrameRect = frameSize;
             initialFrame = FrameRect;
             _animationClock = new Clock();
+
+            updateTexture();
         }
 
         public void Play()
@@ -57,14 +64,14 @@ namespace Fenrir
 
         public void Run()
         {
-            if (!isRunning)
+            if (!isRunning && !IsLooping)
             {
                 return;
             }
 
             if (_animationClock.ElapsedTime.AsSeconds() > _frameDuration)
             {
-                return;
+                updateTexture();
             }
 
             if (FrameRect.Left >= (this.Texture.Size.X - FrameRect.Width))
@@ -83,7 +90,6 @@ namespace Fenrir
             }
 
             FrameRect.Left += _direction * FrameRect.Width;
-            updateTexture();
         }
 
         private void updateTexture()

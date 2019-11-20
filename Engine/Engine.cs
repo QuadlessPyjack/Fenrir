@@ -23,7 +23,6 @@ namespace Fenrir
         private Camera camera;
 
         private bool viewNeedsUpdate = false;
-        private bool mapNeedsUpdate = false;
 
         private GridMap currentMap;
 
@@ -81,15 +80,18 @@ namespace Fenrir
                 }
 
                 currentMap.UpdateMap(mapSurface);
+
+                Vector2i cameraPosition = (Vector2i)camera.Position / Constants.SpriteSize;
+                Vector2i viewEdge = cameraPosition + (Vector2i)(camera.GetView().Size / Constants.SpriteSize);
+                currentMap.UpdateEntitiesAt(cameraPosition, viewEdge);
                 mapSurface.Display();
 
-                if (mapNeedsUpdate)
+                if (currentMap.MapNeedsUpdate)
                 {
                     // update current view only
-                    Vector2i viewEdge = (Vector2i)(camera.Position + camera.GetView().Center / Constants.SpriteSize);
-                    currentMap.RedrawMapAt(mapSurface, (Vector2i)camera.Position, viewEdge);
+                    currentMap.RedrawMapAt(mapSurface, cameraPosition, viewEdge);
                     mapSurface.Display();
-                    mapNeedsUpdate = false;
+                    currentMap.MapNeedsUpdate = false;
                 }
 
                 Sprite renderedMap = new Sprite(mapSurface.Texture);
@@ -98,7 +100,7 @@ namespace Fenrir
 
                 renderWindow.Display();
 
-                renderWindow.WaitAndDispatchEvents();
+                renderWindow.DispatchEvents();
             }
 
             renderWindow.Close();
@@ -113,16 +115,17 @@ namespace Fenrir
                     selectedEntity.OnDeselected();
                 }
                 Constants.SelectedEntities.Clear();
-                mapNeedsUpdate = true;
+                currentMap.MapNeedsUpdate = true;
                 return;
             }
 
             Vector2i screenCoordinates = new Vector2i(e.X, e.Y);
             Console.WriteLine("Clicked at: " + screenCoordinates);
-            Console.WriteLine(camera.Position);
 
             Vector2i worldTextureCoordinates = (Vector2i)camera.Position + screenCoordinates;
             Vector2i worldGridCoordinates = worldTextureCoordinates / Constants.SpriteSize;
+
+            Console.WriteLine(worldGridCoordinates);
             //Console.WriteLine("WorldTextureCoords: " + worldTextureCoordinates);
             //Console.WriteLine("WorldGridCoords: " + worldGridCoordinates);
 

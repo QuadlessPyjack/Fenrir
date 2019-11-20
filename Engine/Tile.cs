@@ -6,7 +6,7 @@ namespace Fenrir
     public class Tile : Sprite, IAsset
     {
         public float Z { get; set; }
-        public int Size { get; private set; }
+        public Vector2i Size { get; private set; }
 
         protected string _name;
         protected int _id;
@@ -48,7 +48,7 @@ namespace Fenrir
             return _name;
         }
 
-        public virtual void SetSize(int size)
+        public virtual void SetSize(Vector2i size)
         {
             Size = size;
         }
@@ -64,6 +64,10 @@ namespace Fenrir
             i = Texture.CopyToImage();
 
             i.SaveToFile(fileName);
+        }
+
+        public virtual void Update()
+        {
         }
     }
 }

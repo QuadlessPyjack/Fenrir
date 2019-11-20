@@ -31,10 +31,5 @@ namespace Fenrir
 
             return map;
         }
-
-        public void DrawMap()
-        {
-
-        }
     }
 }

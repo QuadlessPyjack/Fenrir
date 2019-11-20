@@ -1,5 +1,6 @@
 ﻿using IniParser;
 using IniParser.Model;
+using SFML.Graphics;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -34,6 +35,23 @@ namespace Fenrir
             return asset;
         }
 
+        public static Entity GetEntityNew(string id)
+        {
+            Constants.LoadedAssets.TryGetValue(id, out IAsset asset);
+            Debug.Assert(asset != null, "Asset is null. Have you checked your Asset Count?");
+            string typeName = asset.GetTypeName();
+
+            switch (typeName)
+            {
+                case "entity":
+                    return asset as Entity;
+                case "entity_animated":
+                    return asset as AnimatedEntity;
+                default:
+                    return null;
+            }
+        }
+
         private IAsset spawnObjectByString(string typeName, KeyDataCollection data)
         {
             switch (typeName)
@@ -42,9 +60,54 @@ namespace Fenrir
                     return new TileProvider(data).GetAsset();
                 case "entity":
                     return new EntityProvider(data).GetAsset();
+                case "entity_animated":
+                    return new AnimatedEntityProvider(data).GetAsset();
                 default:
                     return null;
             }
+        }
+    }
+
+    public class AnimatedEntityProvider : AssetProvider
+    {
+        public AnimatedEntityProvider(KeyDataCollection section) : base(section)
+        {
+        }
+
+        public override string Name { get { return "entity"; } }
+
+        public override IAsset GetAsset()
+        {
+            string textureName = _iniSection["Texture"].Trim('"');
+            string assetName = _iniSection["Name"].Trim('"');
+            _ = bool.TryParse(_iniSection["IsSelectable"], out bool isSelectable);
+            _ = bool.TryParse(_iniSection["IsLooping"], out bool isLooping);
+            _ = int.TryParse(_iniSection["Id"], out int id);
+            _ = int.TryParse(_iniSection["FramesPerSecond"], out int fps);
+            string size = _iniSection["Size"];
+            int width = 0;
+            int height = 0;
+
+            if (size.Contains("x"))
+            {
+                string[] values = size.Split('x');
+                _ = int.TryParse(values[0], out width);
+                _ = int.TryParse(values[1], out height);
+            }
+            else
+            {
+                _ = int.TryParse(size, out width);
+                height = width;
+            }
+
+            Texture cachedTexture = TextureFactory.GetTexture(textureName);
+            IntRect frameSize = new IntRect(0, 0, width * Constants.SpriteSize, height * Constants.SpriteSize);
+            AnimatedEntity entity = new AnimatedEntity(cachedTexture, assetName, id, frameSize, fps);
+            entity.IsSelectable = isSelectable;
+            entity.IsLooping = isLooping;
+            entity.SetSize(new SFML.System.Vector2i(width, height));
+
+            return entity;
         }
     }
 
@@ -62,13 +125,26 @@ namespace Fenrir
             string assetName = _iniSection["Name"].Trim('"');
             _ = bool.TryParse(_iniSection["IsSelectable"], out bool isSelectable);
             _ = int.TryParse(_iniSection["Id"], out int id);
-            _ = int.TryParse(_iniSection["Size"], out int size);
+            string size = _iniSection["Size"];
+            int width = 0;
+            int height = 0;
+
+            if (size.Contains("x"))
+            {
+                string[] values = size.Split('x');
+                _ = int.TryParse(values[0], out width);
+                _ = int.TryParse(values[1], out height);
+            } else
+            {
+                _ = int.TryParse(size, out width);
+                height = width;
+            }
 
             Texture cachedTexture = TextureFactory.GetTexture(textureName);
 
-            Entity entity = new Entity(cachedTexture, assetName, id);
+            SimpleEntity entity = new SimpleEntity(cachedTexture, assetName, id);
             entity.IsSelectable = isSelectable;
-            entity.SetSize(size);
+            entity.SetSize(new SFML.System.Vector2i(width, height));
 
             return entity;
         }
@@ -99,12 +175,26 @@ namespace Fenrir
             string textureName = _iniSection["Texture"].Trim('"');
             string assetName = _iniSection["Name"].Trim('"');
             _ = int.TryParse(_iniSection["Id"], out int id);
-            _ = int.TryParse(_iniSection["Size"], out int size);
+            string size = _iniSection["Size"];
+            int width = 0;
+            int height = 0;
+
+            if (size.Contains("x"))
+            {
+                string[] values = size.Split('x');
+                _ = int.TryParse(values[0], out width);
+                _ = int.TryParse(values[1], out height);
+            }
+            else
+            {
+                _ = int.TryParse(size, out width);
+                height = width;
+            }
 
             Texture cachedTexture = TextureFactory.GetTexture(textureName);
 
             Tile tile = new Tile(cachedTexture, assetName, id);
-            tile.SetSize(size);
+            tile.SetSize(new SFML.System.Vector2i(width, height));
 
             return tile;
         }

@@ -7,7 +7,13 @@ namespace Fenrir
     public class Cell
     {
         public Vector2i GridPosition;
-        public bool IsDirty = false;
+        public bool IsDirty { get { return _isDirty;  }
+                              set {
+                                    _isDirty = value;
+                                    Constants.CurrentMap.MapNeedsUpdate = value;
+                                  }
+                            }
+        private bool _isDirty = false;
         private Tile _baseTile;
         public List<Tile> Tiles { get; private set; }
         public List<Entity> Entities { get; private set; } 
@@ -53,7 +59,7 @@ namespace Fenrir
         {
             Entities.Add(entity);
             entity.currentCell = this;
-            updateTilePosition(entity);
+            updateEntityPosition(entity);
         }
 
         public void AddTile(Tile tile, int z = 0)
@@ -72,8 +78,21 @@ namespace Fenrir
 
         private void updateTilePosition(Tile tile)
         {
-            tile.Position = (Vector2f)(GridPosition * Constants.SpriteSize);
-            Console.WriteLine("Tile position: " + tile.Position);
+            tile.Position = updatePosition();
+            //Console.WriteLine("Tile position: " + tile.Position);
+        }
+
+        private void updateEntityPosition(Entity entity)
+        {
+            entity.Position = updatePosition();
+            entity.Sprite.Position = updatePosition();
+            //Console.WriteLine("Entity position: " + entity.Position);
+        }
+
+        private Vector2f updatePosition()
+        {
+            Vector2f position = (Vector2f)(GridPosition * Constants.SpriteSize);
+            return position;
         }
     }
 }

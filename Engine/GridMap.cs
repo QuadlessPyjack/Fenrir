@@ -8,6 +8,7 @@ namespace Fenrir
     {
         public int Width = 0;
         public int Height = 0;
+        public bool MapNeedsUpdate = false;
 
         private Cell[,] _cells;
 
@@ -55,8 +56,7 @@ namespace Fenrir
                         continue;
                     }
 
-                    Entity cachedEntity = AssetFactory.GetAsset(entityId.ToString()) as Entity;
-                    Entity instance = new Entity(cachedEntity);
+                    Entity instance = AssetFactory.GetEntityNew(entityId.ToString());
 
                     currentCell.AddEntity(instance);
                 }
@@ -65,6 +65,8 @@ namespace Fenrir
 
         public void DrawMap(RenderTexture renderSurface)
         {
+            List<Entity> mapEntities = new List<Entity>();
+
             for (int x = 0; x < Width; x++)
             {
                 for (int y = 0; y < Height; y++)
@@ -78,14 +80,19 @@ namespace Fenrir
                         //tile.DumpTextureToFile("./tile_" + x + "_" + y + ".jpg");
                     }
 
-                    foreach (Entity entity in currentCell.Entities)
+                    if (currentCell.Entities.Count > 0)
                     {
-                        renderSurface.Draw(entity);
-                        foreach (Tile attachedOverlay in entity.AttachedOverlays)
-                        {
-                            renderSurface.Draw(attachedOverlay);
-                        }
+                        mapEntities.AddRange(currentCell.Entities);
                     }
+                }
+            }
+
+            foreach (Entity entity in mapEntities)
+            {
+                renderSurface.Draw(entity.Sprite);
+                foreach (Tile attachedOverlay in entity.AttachedOverlays)
+                {
+                    renderSurface.Draw(attachedOverlay);
                 }
             }
         }
@@ -95,13 +102,48 @@ namespace Fenrir
             RedrawMapAt(renderSurface, new Vector2i(0, 0), new Vector2i(Width, Height));
         }
 
+        private Vector2i clampCoordsIfInvalid(Vector2i coordinates)
+        {
+            Vector2i newCoords = coordinates;
+            if (coordinates.X < 0)  newCoords.X = 0;
+            //if (coordinates.X > Width) newCoords.X = Width;
+            if (coordinates.Y < 0) newCoords.Y = 0;
+            //if (coordinates.Y > Height) newCoords.Y = Height;
+
+            return newCoords;
+        }
+
+        public void UpdateEntitiesAt(Vector2i start, Vector2i end)
+        {
+            Vector2i startCoords = clampCoordsIfInvalid(start);
+            Vector2i endCoords = clampCoordsIfInvalid(end);
+
+            List<Entity> entities = new List<Entity>();
+
+            for (int x = startCoords.X; x < endCoords.X; x++)
+            {
+                for (int y = startCoords.Y; y < endCoords.Y; y++)
+                {
+                    entities.AddRange(_cells[x, y].Entities);
+                }
+            }
+
+            foreach (var entity in entities)
+            {
+                entity.Update();
+            }
+        }
+
         public void RedrawMapAt(RenderTexture renderSurface, Vector2i start, Vector2i end)
         {
             List<Entity> dirtyEntities = new List<Entity>();
 
-            for (int x = start.X; x < end.X; x++)
+            Vector2i startClamped = clampCoordsIfInvalid(start);
+            Vector2i endClamped = clampCoordsIfInvalid(end);
+
+            for (int x = startClamped.X; x < endClamped.X; x++)
             {
-                for (int y = start.Y; y < end.Y; y++)
+                for (int y = startClamped.Y; y < endClamped.Y; y++)
                 {
                     Cell currentCell = _cells[x, y];
 
@@ -127,29 +169,36 @@ namespace Fenrir
 
             foreach (Entity entity in dirtyEntities)
             {
-                renderSurface.Draw(entity);
+                if (entity.Size.X > 1 && entity.Size.Y > 1)
+                {
+                    MarkAdjacentCellsForRedraw(entity.currentCell.GridPosition, entity.Size);
+                }
+                renderSurface.Draw(entity.Sprite);
+                //(entity as IAsset)?.Update();
+
                 foreach (Tile attachedOverlay in entity.AttachedOverlays)
                 {
                     renderSurface.Draw(attachedOverlay);
-                    //if (attachedOverlay.Size > 1)
-                    {
-                        //markAdjacentCellsForRedraw(entity.currentCell.GridPosition, attachedOverlay.Size);
-                    }
+                    MarkAdjacentCellsForRedraw(entity.currentCell.GridPosition, attachedOverlay.Size);
                 }
             }
         }
 
-        public void MarkAdjacentCellsForRedraw(Vector2i rootCell, int size)
+        public void MarkAdjacentCellsForRedraw(Vector2i rootCell, Vector2i size)
         {
-                for (int adjacentCellXIdx = 0; adjacentCellXIdx < size; adjacentCellXIdx++)
+                for (int adjacentCellXIdx = 0; adjacentCellXIdx < size.X; adjacentCellXIdx++)
                 {
-                    for (int adjacentCellYIdx = 0; adjacentCellYIdx < size; adjacentCellYIdx++)
+                    for (int adjacentCellYIdx = 0; adjacentCellYIdx < size.Y; adjacentCellYIdx++)
                     {
                         if ((adjacentCellXIdx == 0) && (adjacentCellYIdx == 0))
                         {
                             continue;
                         }
                         Cell adjacentCell = GetCellAt(rootCell.X + adjacentCellXIdx, rootCell.Y + adjacentCellYIdx);
+                        if (adjacentCell.IsDirty)
+                        {
+                            continue;
+                        }
                         adjacentCell.IsDirty = true;
                     }
                 }

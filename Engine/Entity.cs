@@ -5,34 +5,64 @@ using System.Collections.Generic;
 
 namespace Fenrir
 {
-    public class Entity : Tile
+    public class Entity : IAsset
     {
+        public string Name { get; set; }
         public bool IsSelectable = false;
         public bool IsSelectBlocking = false;
         public bool IsSelected = false;
+        public Vector2f Position;
+
+        public Vector2i Size { get; private set; }
 
         public Cell currentCell = null;
 
         public List<Tile> AttachedOverlays;
-        private int _overlaySize;
 
-        public Entity(Entity entity) : base(entity)
+        public Sprite Sprite;
+
+        protected int _id;
+        protected Vector2i _overlaySize;
+
+        public Entity()
         {
-            IsSelectable = entity.IsSelectable;
-            IsSelectBlocking = entity.IsSelectBlocking;
+            _id = -1;
+            Name = "";
+            Size = new Vector2i();
+            _overlaySize = new Vector2i();
+            AttachedOverlays = new List<Tile>();
+            Sprite = new Sprite();
+            Sprite.Position = Position;
+        }
 
+        public Entity(Entity e)
+        {
+            _id = e._id;
+            Name = e.Name;
+            Size = e.Size;
+            _overlaySize = e._overlaySize;
+            AttachedOverlays = e.AttachedOverlays;
+            IsSelectable = e.IsSelectable;
+            IsSelectBlocking = e.IsSelectBlocking;
+            IsSelected = e.IsSelected;
+            Sprite = e.Sprite;
+            Position = e.Position;
+        }
+
+        public Entity(Texture texture, string name, int id)
+        {
+            Name = name;
+            _id = id;
+            Sprite = new Sprite(texture);
+            Sprite.Position = Position;
+            Size = new Vector2i();
+            _overlaySize = new Vector2i();
             AttachedOverlays = new List<Tile>();
         }
 
-        public Entity(Texture texture, string name = "Item", int id = -1) 
-                     : base(texture, name, id)
+        public virtual void SetSize(Vector2i size)
         {
-            
-        }
-
-        public override string GetTypeName()
-        {
-            return "item";
+            Size = size;
         }
 
         public virtual bool OnClicked()
@@ -49,13 +79,14 @@ namespace Fenrir
 
             if (_overlaySize != Size)
             {
-                float scale = (float)Size / selectedOverlay.Size;
-                selectedOverlay.Scale = new Vector2f(scale, scale);
+                float scaleX = (float)Size.X / selectedOverlay.Size.X;
+                float scaleY = (float)Size.Y / selectedOverlay.Size.Y;
+                selectedOverlay.Scale = new Vector2f(scaleX, scaleY);
             }
 
             AttachedOverlays.Add(selectedOverlay);
 
-            Console.WriteLine("Clicked: " + _name);
+            Console.WriteLine("Clicked: " + Name);
             Constants.SelectedEntities.Add(this);
 
             IsSelected = true;
@@ -78,6 +109,26 @@ namespace Fenrir
             currentCell.IsDirty = true;
             Constants.CurrentMap.MarkAdjacentCellsForRedraw(currentCell.GridPosition, _overlaySize);
             IsSelected = false;
+        }
+
+        public virtual string GetTypeName()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual string GetName()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual int GetId()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void Update()
+        {
+            Console.WriteLine("Entity update called!");
         }
     }
 }

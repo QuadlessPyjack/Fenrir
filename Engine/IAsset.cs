@@ -1,10 +1,14 @@
-﻿namespace Fenrir
+﻿using SFML.System;
+
+namespace Fenrir
 {
     public interface IAsset
     {
         string GetTypeName();
         string GetName();
         int GetId();
-        void SetSize(int size);
+        void SetSize(Vector2i size);
+
+        void Update();
     }
 }
