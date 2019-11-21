@@ -9,6 +9,8 @@ namespace Fenrir
         int GetId();
         void SetSize(Vector2i size);
 
+        void SetCollision(string collisionType);
+
         void Update();
     }
 }

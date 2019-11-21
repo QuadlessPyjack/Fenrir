@@ -18,9 +18,16 @@ namespace Fenrir
         public static Dictionary<string, Texture> LoadedTextures = new Dictionary<string, Texture>();
         public static Dictionary<string, IAsset> LoadedAssets = new Dictionary<string, IAsset>();
 
+        public static Dictionary<string, Collider> LoadedColliders = new Dictionary<string, Collider>();
+
         public static List<Entity> SelectedEntities = new List<Entity>();
         public static GridMap CurrentMap;
-
         public static float CameraSpeed = 3.0f;
+
+        public enum CollisionDefaults
+        {
+            Impassable = -1,
+            None = 0,
+        }
     }
 }

@@ -11,6 +11,8 @@ namespace Fenrir
         public bool IsSelectable = false;
         public bool IsSelectBlocking = false;
         public bool IsSelected = false;
+
+        public bool IsFixed = true;
         public Vector2f Position;
 
         public Vector2i Size { get; private set; }
@@ -23,6 +25,8 @@ namespace Fenrir
 
         protected int _id;
         protected Vector2i _overlaySize;
+
+        public Collider CollisionType;
 
         public Entity()
         {
@@ -129,6 +133,46 @@ namespace Fenrir
         public virtual void Update()
         {
             Console.WriteLine("Entity update called!");
+        }
+
+        public void SetCollision(string collisionType)
+        {
+            bool isOk = Constants.LoadedColliders.TryGetValue(collisionType, out Collider collider);
+
+            if (!isOk)
+            {
+                CollisionType = new Collider();
+                return;
+            }
+
+            CollisionType = collider;
+        }
+
+        private bool isAccessible(Vector2i gridLocation)
+        {
+            Cell locationCell = Constants.CurrentMap.GetCellAt(gridLocation);
+
+            int tileCollider = locationCell.Tiles[0].CollisionType;
+
+            bool isTileAccessible = CollisionType.CheckCollision(tileCollider);
+
+            if (!isTileAccessible)
+            {
+                return false;
+            }
+
+            // check if there are entities here blocking access
+
+            foreach (var entity in locationCell.Entities)
+            {
+                bool isEntityNotBlocking = CollisionType.CheckCollision(entity.CollisionType);
+                if (!isEntityNotBlocking)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

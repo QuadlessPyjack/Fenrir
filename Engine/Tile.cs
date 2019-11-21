@@ -6,6 +6,8 @@ namespace Fenrir
     public class Tile : Sprite, IAsset
     {
         public float Z { get; set; }
+
+        public int CollisionType = -1;
         public Vector2i Size { get; private set; }
 
         protected string _name;
@@ -56,6 +58,18 @@ namespace Fenrir
         public int GetId()
         {
             return _id;
+        }
+
+        public void SetCollision(string collisionType)
+        {
+            bool isOk = Constants.LoadedColliders.TryGetValue(collisionType, out Collider collider);
+            if (!isOk)
+            {
+                CollisionType = -1;
+                return;
+            }
+
+            CollisionType = collider.CollisionIndex;
         }
 
         public void DumpTextureToFile(string fileName)
