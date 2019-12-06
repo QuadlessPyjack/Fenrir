@@ -1,9 +1,7 @@
-﻿using Fenrir;
-using SFML.Graphics;
-using SFML.System;
+﻿using SFML.System;
 using System.Collections.Generic;
 
-namespace Engine.IO
+namespace Fenrir.IO
 {
     public class SimpleEntityInfo : AssetInfo
     {
@@ -15,7 +13,7 @@ namespace Engine.IO
         public Vector2i Size;
         public Vector2i OverlaySize;
         public bool IsSelected;
-        public Fenrir.Texture Sprite;
+        public Texture Sprite;
         public Vector2i Position;
         public int Z;
         public Collider CollisionType;

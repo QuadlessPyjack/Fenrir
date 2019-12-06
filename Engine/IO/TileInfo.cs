@@ -1,13 +1,12 @@
-﻿using SFML.Graphics;
-using SFML.System;
+﻿using SFML.System;
 
-namespace Engine.IO
+namespace Fenrir.IO
 {
     public class TileInfo : AssetInfo
     {
         public int Z;
         public Vector2i Size;
-        public Fenrir.Texture TileTexture;
+        public Texture TileTexture;
         public int CollisionType;
     }
 }

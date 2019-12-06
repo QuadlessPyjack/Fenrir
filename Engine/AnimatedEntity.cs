@@ -78,5 +78,16 @@ namespace Fenrir
         {
             return "entity_animated";
         }
+
+        public override object Clone()
+        {
+            AnimatedEntity ae = new AnimatedEntity();
+            AnimatedSprite animsprite = ((Sprite as AnimatedSprite).Clone() as AnimatedSprite);
+            ae.Name = Name;
+            ae._id = _id;
+            ae.Sprite = animsprite;
+
+            return ae;
+        }
     }
 }

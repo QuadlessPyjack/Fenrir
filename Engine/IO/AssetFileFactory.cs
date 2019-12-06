@@ -1,10 +1,9 @@
-﻿using Engine.IO;
-using IniParser;
+﻿using IniParser;
 using IniParser.Model;
 using SFML.Graphics;
 using System.Diagnostics;
 
-namespace Fenrir
+namespace Fenrir.IO
 {
     public class AssetFileFactory
     {
@@ -45,12 +44,14 @@ namespace Fenrir
             {
                 case "entity":
                     {
-                        Entity e = new Entity(asset as Entity);
+                        Entity e = (Entity)(asset as Entity).Clone();
                         return e;
                     }
                 case "entity_animated":
                     {
-                        return asset as AnimatedEntity;
+                        AnimatedEntity ae = (AnimatedEntity)(asset as AnimatedEntity).Clone();
+                        return ae;
+                        //return asset as AnimatedEntity;
                     }
                 default:
                     return null;

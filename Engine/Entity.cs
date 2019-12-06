@@ -1,11 +1,12 @@
-﻿using SFML.Graphics;
+﻿using Fenrir.IO;
+using SFML.Graphics;
 using SFML.System;
 using System;
 using System.Collections.Generic;
 
 namespace Fenrir
 {
-    public class Entity : IAsset
+    public class Entity : IAsset, ICloneable
     {
         public string Name { get; set; }
         public bool IsSelectable = false;
@@ -177,6 +178,25 @@ namespace Fenrir
             }
 
             return true;
+        }
+
+        public virtual object Clone()
+        {
+            Entity e = new Entity();
+            e._id = _id;
+            e.Name = Name;
+            e.Size = Size;
+            e._overlaySize = _overlaySize;
+            e.AttachedOverlays = AttachedOverlays;
+            e.IsSelectable = IsSelectable;
+            e.IsSelectBlocking = IsSelectBlocking;
+            e.IsSelected = IsSelected;
+            e.Sprite = Sprite;
+            e.Position = Position;
+            e.Z = _z;
+            e.CollisionType = CollisionType;
+
+            return e;
         }
     }
 }

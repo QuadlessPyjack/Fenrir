@@ -1,14 +1,10 @@
 ﻿using SFML.Graphics;
 using SFML.System;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Fenrir
 {
-    public class AnimatedSprite : Sprite
+    public class AnimatedSprite : Sprite, ICloneable
     {
         public IntRect FrameRect = new IntRect(0, 0, Constants.SpriteSize, Constants.SpriteSize);
         private float _frameDuration = 1.0f / 30.0f;
@@ -110,6 +106,21 @@ namespace Fenrir
         {
             TextureRect = FrameRect;
             _animationClock.Restart();
+        }
+
+        public object Clone()
+        {
+            AnimatedSprite animSprite = new AnimatedSprite();
+            animSprite.FrameRect = FrameRect;
+            animSprite._frameDuration = _frameDuration;
+            animSprite.FramesPerSecond = FramesPerSecond;
+            animSprite.IsLooping = IsLooping;
+            animSprite.IsPingPong = IsPingPong;
+            animSprite.initialFrame = initialFrame;
+            animSprite.isRunning = isRunning;
+            animSprite._direction = _direction;
+
+            return animSprite;
         }
     }
 }

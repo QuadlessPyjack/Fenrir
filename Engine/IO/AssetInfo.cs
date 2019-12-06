@@ -1,5 +1,5 @@
 ﻿
-namespace Engine.IO
+namespace Fenrir.IO
 {
     public class AssetInfo
     {

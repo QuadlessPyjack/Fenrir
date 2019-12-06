@@ -15,6 +15,13 @@ namespace Fenrir
             AttachedOverlays = new List<Tile>();
         }
 
+        public SimpleEntity() : base()
+        {
+            IsSelectable = false;
+            IsSelectBlocking = false;
+            AttachedOverlays = new List<Tile>();
+        }
+
         public SimpleEntity(Texture texture, string name = "entity", int id = -1) 
         {
             Sprite = new Sprite(texture);
@@ -41,6 +48,17 @@ namespace Fenrir
         public override void Update()
         {
             // nothing to do here
+        }
+
+        public override object Clone()
+        {
+            SimpleEntity se = new SimpleEntity();
+            se.IsSelectable = IsSelectable;
+            se.IsSelectBlocking = IsSelectBlocking;
+            se.Sprite.Position = Position;
+            se.AttachedOverlays = new List<Tile>();
+            
+            return se;
         }
     }
 }

@@ -1,8 +1,7 @@
-﻿using Fenrir;
-using SFML.Graphics;
+﻿using SFML.Graphics;
 using SFML.System;
 
-namespace Engine.IO
+namespace Fenrir.IO
 {
     public class AnimatedEntityInfo : AssetInfo
     {

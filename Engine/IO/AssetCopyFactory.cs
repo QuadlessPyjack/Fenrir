@@ -1,32 +1,34 @@
-﻿using Fenrir;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Engine.IO
+﻿namespace Fenrir.IO
 {
     public class AssetCopyFactory
     {
         public T GetProvider<T>() where T : AssetCopyProvider
         {
-            
+            switch (typeof(T).Name)
+            {
+                case "TileCopyProvider":
+                    return new TileCopyProvider() as T;
+                case "EntitySimpleCopyProvider":
+                    return new EntitySimpleCopyProvider() as T;
+                case "AnimatedEntityCopyProvider":
+                    return new AnimatedEntityCopyProvider() as T;
+                default:
+                    return null;
+            }
         }
     }
 
     public abstract class AssetCopyProvider
     {
         public abstract string Name { get; }
-        public abstract V GetAsset<T,V>(T fileInfo) where T : AssetInfo where V : IAsset;
+        public abstract IAsset GetAsset<T>(T fileInfo) where T : AssetInfo;
     }
 
     public class TileCopyProvider : AssetCopyProvider
     {
         public override string Name { get { return "tileCopyProvider"; } }
 
-        public override V GetAsset<T, V>(T fileInfo) where V : IAsset
+        public override IAsset GetAsset<T>(T fileInfo)
         {
             if (!fileInfo.Name.Contains("tile"))
             {

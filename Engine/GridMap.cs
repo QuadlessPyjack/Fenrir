@@ -1,6 +1,7 @@
 ﻿using SFML.System;
 using SFML.Graphics;
 using System.Collections.Generic;
+using Fenrir.IO;
 
 namespace Fenrir
 {
@@ -11,6 +12,8 @@ namespace Fenrir
         public bool MapNeedsUpdate = false;
 
         private Cell[,] _cells;
+
+        private AssetCopyFactory _copyFactory = new AssetCopyFactory();
 
         public GridMap()
         {
