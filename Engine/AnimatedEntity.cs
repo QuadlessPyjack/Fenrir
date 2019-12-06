@@ -27,7 +27,10 @@ namespace Fenrir
         public AnimatedEntity(AnimatedEntity ae)
             : base(ae)
         {
-            Sprite = ae.Sprite;
+            AnimatedSprite animsprite = new AnimatedSprite(ae.Sprite as AnimatedSprite);
+            Name = ae.Name;
+            _id = ae._id;
+            Sprite = animsprite;
         }
 
         public void PlayAnimation()

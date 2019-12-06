@@ -10,27 +10,46 @@ namespace Fenrir
         public int CollisionField = 0;
         public int Id = 0;
         public string Name = "";
+        public int[] CollisionBounds;
 
         // check collision with other entities
-        public bool CheckCollision(Collider collider)
+        public bool CheckCollision(Collider collider, int location = 0)
         {
             bool isColliding = (CollisionField | (1 << collider.CollisionIndex)) == CollisionField;
 
-            return isColliding;
+            if (CollisionBounds == null || CollisionBounds.Length == 0)
+            {
+                return isColliding;
+            }
+
+            return CollisionBounds[location] == 0 ? false : isColliding;
         }
 
         // check collision with tiles
-        public bool CheckCollision(int collisionIndex)
+        public bool CheckCollision(int collisionIndex, int location = 0)
         {
             bool isColliding = (CollisionField | (1 << collisionIndex)) == CollisionField;
 
-            return isColliding;
+            if (CollisionBounds == null || CollisionBounds.Length == 0)
+            {
+                return isColliding;
+            }
+
+            return CollisionBounds[location] == 0 ? false : isColliding;
         }
 
         public Collider(int id = 0, string name = "")
         {
             Id = id;
             Name = name;
+        }
+
+        public Collider(int[] bounds, int id = 0, string name = "")
+        {
+            Id = id;
+            Name = name;
+
+            CollisionBounds = bounds;
         }
     }
 
@@ -43,6 +62,10 @@ namespace Fenrir
             IniData data = parser.ReadFile(collisionIniFilePath);
 
             int collidersCount = int.Parse(data["Collision"]["Count"]);
+
+            Collider none = new Collider(-1, "None");
+            none.CollisionField = 0;
+            Constants.LoadedColliders.Add(none.Name, none);
 
             for (int idx = 0; idx < collidersCount; idx++)
             {

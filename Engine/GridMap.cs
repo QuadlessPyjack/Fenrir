@@ -43,7 +43,7 @@ namespace Fenrir
                 {
                     int currentIdx = y * Width + x;
                     int assetId = mapInfo.Tiles[currentIdx];
-                    Tile cachedTile = AssetFactory.GetAsset(assetId.ToString()) as Tile;
+                    Tile cachedTile = AssetFileFactory.GetAsset(assetId.ToString()) as Tile;
                     Tile instancedTile = new Tile(cachedTile);
                     Cell currentCell = new Cell();
                     currentCell.GridPosition = new Vector2i(x, y);
@@ -56,7 +56,7 @@ namespace Fenrir
                         continue;
                     }
 
-                    Entity instance = AssetFactory.GetEntityNew(entityId.ToString());
+                    Entity instance = AssetFileFactory.GetEntity(entityId.ToString());
 
                     currentCell.AddEntity(instance);
                 }
@@ -66,27 +66,35 @@ namespace Fenrir
         public void DrawMap(RenderTexture renderSurface)
         {
             List<Entity> mapEntities = new List<Entity>();
-
-            for (int x = 0; x < Width; x++)
+            for (int z = 0; z < (int)Constants.ZLayers.Count; z++)
             {
-                for (int y = 0; y < Height; y++)
+                for (int x = 0; x < Width; x++)
                 {
-                    Cell currentCell = _cells[x, y];
-
-                    foreach (Tile tile in currentCell.Tiles)
+                    for (int y = 0; y < Height; y++)
                     {
-                        renderSurface.Draw(tile);
+                        Cell currentCell = _cells[x, y];
 
-                        //tile.DumpTextureToFile("./tile_" + x + "_" + y + ".jpg");
-                    }
+                        foreach (Tile tile in currentCell.Tiles)
+                        {
+                            if (tile.Z != z)
+                            {
+                                continue;
+                            }
 
-                    if (currentCell.Entities.Count > 0)
-                    {
-                        mapEntities.AddRange(currentCell.Entities);
+                            renderSurface.Draw(tile);
+
+                            //tile.DumpTextureToFile("./tile_" + x + "_" + y + ".jpg");
+                        }
+
+                        if (currentCell.Entities.Count > 0)
+                        {
+                            mapEntities.AddRange(currentCell.Entities);
+                        }
                     }
                 }
             }
 
+            mapEntities.Sort(new ZComparer());
             foreach (Entity entity in mapEntities)
             {
                 renderSurface.Draw(entity.Sprite);

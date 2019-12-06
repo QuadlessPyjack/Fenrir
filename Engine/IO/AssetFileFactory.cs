@@ -1,12 +1,12 @@
-﻿using IniParser;
+﻿using Engine.IO;
+using IniParser;
 using IniParser.Model;
 using SFML.Graphics;
-using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Fenrir
 {
-    public class AssetFactory
+    public class AssetFileFactory
     {
         public void LoadAssets()
         {
@@ -35,7 +35,7 @@ namespace Fenrir
             return asset;
         }
 
-        public static Entity GetEntityNew(string id)
+        public static Entity GetEntity(string id)
         {
             Constants.LoadedAssets.TryGetValue(id, out IAsset asset);
             Debug.Assert(asset != null, "Asset is null. Have you checked your Asset Count?");
@@ -44,9 +44,14 @@ namespace Fenrir
             switch (typeName)
             {
                 case "entity":
-                    return asset as Entity;
+                    {
+                        Entity e = new Entity(asset as Entity);
+                        return e;
+                    }
                 case "entity_animated":
-                    return asset as AnimatedEntity;
+                    {
+                        return asset as AnimatedEntity;
+                    }
                 default:
                     return null;
             }
@@ -84,7 +89,9 @@ namespace Fenrir
             _ = bool.TryParse(_iniSection["IsLooping"], out bool isLooping);
             _ = int.TryParse(_iniSection["Id"], out int id);
             _ = int.TryParse(_iniSection["FramesPerSecond"], out int fps);
+            bool isZSpecified = int.TryParse(_iniSection["Z"], out int z);
             string size = _iniSection["Size"];
+            string collisionType = _iniSection["CollisionType"];
             int width = 0;
             int height = 0;
 
@@ -106,6 +113,12 @@ namespace Fenrir
             entity.IsSelectable = isSelectable;
             entity.IsLooping = isLooping;
             entity.SetSize(new SFML.System.Vector2i(width, height));
+            entity.SetCollision(collisionType);
+
+            if (isZSpecified)
+            {
+                entity.Z = z;
+            }
 
             return entity;
         }
@@ -125,7 +138,9 @@ namespace Fenrir
             string assetName = _iniSection["Name"].Trim('"');
             _ = bool.TryParse(_iniSection["IsSelectable"], out bool isSelectable);
             _ = int.TryParse(_iniSection["Id"], out int id);
+            bool isZSpecified = int.TryParse(_iniSection["Z"], out int z);
             string size = _iniSection["Size"];
+            string collisionType = _iniSection["CollisionType"];
             int width = 0;
             int height = 0;
 
@@ -145,6 +160,12 @@ namespace Fenrir
             SimpleEntity entity = new SimpleEntity(cachedTexture, assetName, id);
             entity.IsSelectable = isSelectable;
             entity.SetSize(new SFML.System.Vector2i(width, height));
+            entity.SetCollision(collisionType);
+
+            if (isZSpecified)
+            {
+                entity.Z = z;
+            }
 
             return entity;
         }
@@ -175,7 +196,9 @@ namespace Fenrir
             string textureName = _iniSection["Texture"].Trim('"');
             string assetName = _iniSection["Name"].Trim('"');
             _ = int.TryParse(_iniSection["Id"], out int id);
+            bool isZSpecified = int.TryParse(_iniSection["Z"], out int z);
             string size = _iniSection["Size"];
+            string collisionType = _iniSection["CollisionType"];
             int width = 0;
             int height = 0;
 
@@ -195,6 +218,12 @@ namespace Fenrir
 
             Tile tile = new Tile(cachedTexture, assetName, id);
             tile.SetSize(new SFML.System.Vector2i(width, height));
+            tile.SetCollision(collisionType);
+
+            if (isZSpecified)
+            {
+                tile.Z = z;
+            }
 
             return tile;
         }

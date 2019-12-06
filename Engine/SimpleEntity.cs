@@ -15,7 +15,7 @@ namespace Fenrir
             AttachedOverlays = new List<Tile>();
         }
 
-        public SimpleEntity(Texture texture, string name = "Item", int id = -1) 
+        public SimpleEntity(Texture texture, string name = "entity", int id = -1) 
         {
             Sprite = new Sprite(texture);
             Sprite.Position = Position;
@@ -35,7 +35,7 @@ namespace Fenrir
 
         public override string GetTypeName()
         {
-            return "item";
+            return "entity";
         }
 
         public override void Update()

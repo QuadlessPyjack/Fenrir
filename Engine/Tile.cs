@@ -5,7 +5,8 @@ namespace Fenrir
 {
     public class Tile : Sprite, IAsset
     {
-        public float Z { get; set; }
+        public int Z { get { return _z; } set { _z = value; } }
+        private int _z = 0;
 
         public int CollisionType = -1;
         public Vector2i Size { get; private set; }
@@ -26,18 +27,19 @@ namespace Fenrir
             Z = tile.Z;
             Size = tile.Size;
             Texture = tile.Texture;
+            CollisionType = tile.CollisionType;
         }
 
         public void SetPosition(float x, float y, float z)
         {
             Position = new Vector2f(x, y);
-            Z = z;
+            Z = (int)z;
         }
 
         public void SetPosition(Vector3f position)
         {
             Position = new Vector2f(position.X, position.Y);
-            Z = position.Z;
+            Z = (int)position.Z;
         }
 
         public virtual string GetTypeName()

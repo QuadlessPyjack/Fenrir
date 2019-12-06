@@ -4,6 +4,14 @@ using System.Collections.Generic;
 
 namespace Fenrir
 {
+
+    internal class ZComparer : IComparer<Entity>
+    {
+        public int Compare(Entity x, Entity y)
+        {
+            return x.Z.CompareTo(y.Z);
+        }
+    }
     public class Cell
     {
         public Vector2i GridPosition;
@@ -21,7 +29,7 @@ namespace Fenrir
         public Cell()
         {
             Tiles = new List<Tile>();
-            Entities = new List<Entity>();
+            Entities = new List<Entity>(64);
         }
 
         public bool OnClicked()
@@ -57,7 +65,18 @@ namespace Fenrir
 
         public void AddEntity(Entity entity)
         {
-            Entities.Add(entity);
+            if (Entities.Count >= entity.Z && Entities[entity.Z] == null)
+            {
+                Entities.Insert(entity.Z, entity);
+            } else
+            {
+                Entities.Add(entity);
+                if (Entities.Count > 0)
+                {
+                    Entities.Sort(new ZComparer());
+                }
+            }
+
             entity.currentCell = this;
             updateEntityPosition(entity);
         }

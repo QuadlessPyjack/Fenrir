@@ -29,6 +29,18 @@ namespace Fenrir
             updateTexture();
         }
 
+        public AnimatedSprite(AnimatedSprite ae)
+        {
+            FrameRect = ae.FrameRect;
+            _frameDuration = ae._frameDuration;
+            FramesPerSecond = ae.FramesPerSecond;
+            IsLooping = ae.IsLooping;
+            IsPingPong = ae.IsPingPong;
+            initialFrame = ae.initialFrame;
+            isRunning = ae.isRunning;
+            _direction = ae._direction;
+        }
+
         public AnimatedSprite(SFML.Graphics.Texture texture, IntRect frameSize) : base(texture)
         {
             FrameRect = frameSize;
@@ -81,11 +93,13 @@ namespace Fenrir
                 {
                     FrameRect.Left = 0;
                     _direction = 1;
+                    return;
                 }
 
                 if (IsPingPong)
                 {
                     _direction = -1;
+                    return;
                 }
             }
 

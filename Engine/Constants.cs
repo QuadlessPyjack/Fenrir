@@ -29,5 +29,14 @@ namespace Fenrir
             Impassable = -1,
             None = 0,
         }
+
+        public enum ZLayers
+        {
+            Tile = 0,
+            Unit = 1,
+            Building = 2,
+            Flying = 3,
+            Count
+        }
     }
 }

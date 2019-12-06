@@ -14,6 +14,8 @@ namespace Fenrir
 
         public bool IsFixed = true;
         public Vector2f Position;
+        public int Z { get { return _z; } set { _z = value; } }
+        private int _z = 1;
 
         public Vector2i Size { get; private set; }
 
@@ -51,6 +53,8 @@ namespace Fenrir
             IsSelected = e.IsSelected;
             Sprite = e.Sprite;
             Position = e.Position;
+            Z = e._z;
+            CollisionType = e.CollisionType;
         }
 
         public Entity(Texture texture, string name, int id)
@@ -76,7 +80,7 @@ namespace Fenrir
                 return false;
             }
 
-            Tile cachedTile = AssetFactory.GetAsset("3") as Tile;
+            Tile cachedTile = AssetFileFactory.GetAsset("3") as Tile;
             Tile selectedOverlay = new Tile(cachedTile);
             selectedOverlay.Position = Position;
             _overlaySize = selectedOverlay.Size;
@@ -132,7 +136,7 @@ namespace Fenrir
 
         public virtual void Update()
         {
-            Console.WriteLine("Entity update called!");
+            //Console.WriteLine("Entity update called!");
         }
 
         public void SetCollision(string collisionType)

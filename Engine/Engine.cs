@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Fenrir;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
@@ -16,7 +11,7 @@ namespace Fenrir
         private bool shouldQuit = false;
 
         private TextureFactory textureFactory;
-        private AssetFactory assetFactory;
+        private AssetFileFactory assetFactory;
         private MapLoader mapLoader;
 
         private RenderTexture mapSurface;
@@ -25,12 +20,16 @@ namespace Fenrir
         private bool viewNeedsUpdate = false;
 
         private GridMap currentMap;
+        private ColliderGenerator colliderGenerator;
+        private Cursor cursor;
 
         private void Initialize()
         {
             textureFactory = new TextureFactory();
-            assetFactory = new AssetFactory();
+            assetFactory = new AssetFileFactory();
             mapLoader = new MapLoader();
+            colliderGenerator = new ColliderGenerator();
+            colliderGenerator.LoadCollisionData();
 
             textureFactory.LoadTextures();
             assetFactory.LoadAssets();
@@ -56,6 +55,12 @@ namespace Fenrir
             //i.SaveToFile("./test.jpeg");
 
             renderWindow.SetView(camera.GetView());
+
+            cursor = new Cursor();
+            cursor.Position = new Vector2f(renderWindow.Size.X * 0.5f, renderWindow.Size.Y * 0.5f);
+            renderWindow.SetMouseCursorVisible(false);
+
+            cursor.SetState(Cursor.State.ARROW);
         }
         public Engine()
         {
@@ -65,6 +70,7 @@ namespace Fenrir
             renderWindow.MouseWheelScrolled += HandleMouseWheelScrolled;
             renderWindow.MouseButtonReleased += HandleMouseButtonReleased;
             renderWindow.Closed += HandleMainWindowClosed;
+            renderWindow.MouseMoved += HandleMouseMoved;
 
             Initialize();
             
@@ -98,12 +104,64 @@ namespace Fenrir
                 //renderedMap.Texture.CopyToImage().SaveToFile("./mapDump" + DateTime.Now.Millisecond + ".jpg");
                 renderWindow.Draw(renderedMap);
 
+                cursor.Update();
+                renderWindow.Draw(cursor.CurrentIcon);
+
                 renderWindow.Display();
 
                 renderWindow.DispatchEvents();
             }
 
             renderWindow.Close();
+        }
+
+        private void HandleMouseMoved(object sender, MouseMoveEventArgs e)
+        {
+            cursor.Position = new Vector2f(e.X, e.Y);
+            Vector2f screenCoordinates = new Vector2f(e.X, e.Y);
+
+            if (Constants.SelectedEntities.Count == 0 && 
+                cursor.CurrentState != Cursor.State.ARROW)
+            {
+                cursor.SetState(Cursor.State.ARROW);
+            }
+
+            Cell hoveredCell = GetCellAtScreenCoordinates(screenCoordinates);
+            if (hoveredCell == null) return;
+
+            if (hoveredCell.Tiles.Count == 0)
+            {
+                return;
+            }
+
+            if (cursor.CurrentState == Cursor.State.MOVE || cursor.CurrentState == Cursor.State.DENIED)
+            {
+                int tileCollider = hoveredCell.Tiles[0].CollisionType;
+                //Console.WriteLine("tileCollider: " + tileCollider);
+
+                foreach (var entity in Constants.SelectedEntities)
+                {
+                    bool isColliding = entity.CollisionType.CheckCollision(tileCollider);
+
+                    if (isColliding)
+                    {
+                        cursor.SetState(Cursor.State.DENIED);
+                        return;
+                    }
+                }
+
+                cursor.SetState(Cursor.State.MOVE);
+            }
+
+            if (hoveredCell.Entities.Count == 0)
+            {
+                return;
+            }
+
+            if (cursor.CurrentState == Cursor.State.ARROW)
+            {
+                cursor.SetState(Cursor.State.SELECT);
+            }
         }
 
         private void HandleMouseButtonReleased(object sender, MouseButtonEventArgs e)
@@ -116,21 +174,26 @@ namespace Fenrir
                 }
                 Constants.SelectedEntities.Clear();
                 currentMap.MapNeedsUpdate = true;
+                cursor.SetState(Cursor.State.ARROW);
                 return;
             }
 
-            Vector2i screenCoordinates = new Vector2i(e.X, e.Y);
-            Console.WriteLine("Clicked at: " + screenCoordinates);
+            Vector2f coords = new Vector2f(e.X, e.Y);
+            Cell clickedCell = GetCellAtScreenCoordinates(coords);
 
-            Vector2i worldTextureCoordinates = (Vector2i)camera.Position + screenCoordinates;
+            clickedCell.OnClicked();
+            cursor.SetState(Cursor.State.MOVE);
+        }
+
+        private Cell GetCellAtScreenCoordinates(Vector2f coordinates)
+        {
+            Vector2f screenCoordinates = coordinates;
+
+            Vector2i worldTextureCoordinates = (Vector2i)(camera.Position + screenCoordinates);
             Vector2i worldGridCoordinates = worldTextureCoordinates / Constants.SpriteSize;
 
-            Console.WriteLine(worldGridCoordinates);
-            //Console.WriteLine("WorldTextureCoords: " + worldTextureCoordinates);
-            //Console.WriteLine("WorldGridCoords: " + worldGridCoordinates);
-
             Cell clickedCell = currentMap.GetCellAt(worldGridCoordinates);
-            clickedCell.OnClicked();
+            return clickedCell;
         }
 
         private void HandleMouseWheelScrolled(object sender, MouseWheelScrollEventArgs e)
